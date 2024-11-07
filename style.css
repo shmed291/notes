@@ -2,6 +2,7 @@
     box-sizing:border-box;   
 
     font-family:Arial, Helvetica, sans-serif;
+    user-select: none;
 }
 body{
     background-color:black;
@@ -32,8 +33,6 @@ header p{
 .notes{
     display:flex;
     flex-wrap:wrap;  
-
-   min-height: 500px;
    overflow-x: hidden;
    justify-content: center;
    position: relative;
@@ -124,4 +123,10 @@ textarea{
     font-size: 18px;
     left: -65px;
     top: 53px;
+}
+.add:active{
+    transform: scale(0.8);
+}
+.none{
+    display: none;
 }
