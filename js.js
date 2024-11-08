@@ -1,86 +1,125 @@
-function addEle(){
-    let allNods = document.querySelector(".notes")
-    let d = document.createElement('div')
-d.className = "note"
-let div = document.createElement("div")
-div.className = `top-title`
-d.appendChild(div)
-let input = document.createElement("input")
-input.className = `inps`
-input.setAttribute("type","text")
-d.appendChild(input)
-let textarea = document.createElement("textarea")
-textarea.className="text"
-d.appendChild(textarea)
-allNods.appendChild(d)
+const localSave = localStorage.getItem("note")?JSON.parse(localStorage.getItem("note")) :
+[]
 
-let notes = document.querySelectorAll(".note")
+console.log(localSave);
 
-
-let X = document.querySelector(".closer")
-
-let text = document.querySelectorAll(".text")
-
-let topTitle = document.querySelectorAll(".top-title")
-
-let inp = document.querySelectorAll(".inps")
-
-
-
-
-notes.forEach( note => { 
-        
-    X.addEventListener("click",()=>{
-        note.classList.remove("onclick")
-        note.style.position = `inline`
-        X.style.visibility = `hidden`
-        X.style.opacity = 0
-        topTitle.forEach(tops =>{
-            tops.style.display = `none`
-        })
-        inp.forEach(inps =>{
-            inps.classList.add("top-title-active")
-            inps.disabled = true
-        })
-        text.forEach(texts =>{
-            texts.style.backgroundColor = `#222222`
-            texts.style.display= `none`
-        })
-        document.querySelector(".add").classList.remove("hidde")
-        document.body.style.overflow = ""
-
-    })
-    note.addEventListener("click",()=>{
-         note.classList.add("onclick")
-            X.style.visibility = `visible`
-            X.style.opacity = 1 
-            topTitle.forEach(tops =>{
-                tops.style.display = `block`
-            })
-            text.forEach(texts =>{
-                texts.style.backgroundColor = `black`
-                texts.style.display= `inline`
-            })
-            text.focus
-            document.querySelector(".add").classList.add("hidde")
-            document.body.style.overflow = "hidden"
-            inp.forEach(inps =>{
-                inps.classList.remove("top-title-active")
-                inps.disabled = false
-            })
-
-           
-});
+function disPlayData(){
+    let time = new Date()
+    time = time.toString().split(" ")
+    console.log(`${time[1]}/${time[2]}/${time[3]}`);
+    
+}
+document.querySelector(".add-btn").addEventListener("click",()=>{
+    let item = document.querySelector("#inputNote").value
+    addToLocal(item)
 })
+function display(){
+    let items = ""
+    for(let i =0 ; i < localSave.length ; i++){
+        items += `
+        <div class="note">
+                <textarea disabled>${localSave[i]}</textarea>
+                <div class="icons">
+                    <i class="fa-solid fa-check done"></i>
+                    <i class="fa-solid fa-pen edit"></i>
+                </div>
+                <div class ="btns">
+                     <button class="save ">save</button>
+                     <button class="cancel ">cancel</button>
+                </div>
+            </div>`
+    }
+    document.querySelector(".notes").innerHTML = items
+    doneNote()
+    editNote()
+    cancel()
+}
+function editNote(){
+    let editBtn = document.querySelectorAll(".edit")
+    let text = document.querySelectorAll("textarea")
+    let saveBtn = document.querySelectorAll(".save")
+    let cancel = document.querySelectorAll(".cancel")
+    editBtn.forEach((eb,i) =>{
+        eb.addEventListener("click", () =>{
+            textedit()
+            text[i].disabled = false
+            cancel[i].classList.add("hide")
+
+        })
+        text[i].addEventListener("input",()=>{
+            showSave(i)
+        })
+    })
+
 
 }
-window.onload = ()=>{
-window.localStorage.setItem("widow", document.querySelector(".notes").innerHTML)
+function showSave(i){
+    let text = document.querySelectorAll("textarea")
+    let saveBtn = document.querySelectorAll(".save")
+    let cancel = document.querySelectorAll(".cancel")
+    if(text[i].value ===  localSave[i]){
+           saveBtn[i].classList.remove("hide")
+           cancel[i].classList.add("hide")
 
+    }else{
+   saveBtn[i].classList.add("hide")
+   cancel[i].classList.remove("hide")
 
+    }
+}
 
-                document.querySelector(".notes").innerHTML = localStorage.getItem("widow")
-            }
+function textedit(){
+    let text = document.querySelectorAll("textarea")
+    let saveBtn = document.querySelectorAll(".save")
+    let btns  =document.querySelectorAll('.btns')
+    saveBtn.forEach((sb,i) =>{
+        sb.addEventListener("click", ()=> {
+            save(text[i].value ,i)
+            text[i].disabled = true
+            sb.classList.remove("hide")
+         } )
+    })
+}
+function cancel(){
+let text = document.querySelectorAll("textarea")
+let cancelBtn = document.querySelectorAll(".cancel")
 
+cancelBtn.forEach((cb,i) =>{
+    
+    cb.addEventListener("click",()=>{
 
-let open = 1
+        text[i].disabled = true
+        save(text[i].value,i)
+    })
+}) 
+}
+function save(text,i){
+    let cancelBtn = document.querySelectorAll(".cancel")
+    let saveBtn = document.querySelectorAll(".save")
+    localSave[i] = text
+    localStorage.setItem("note",JSON.stringify(localSave));
+    saveBtn[i].classList.remove("hide")
+        cancelBtn[i].classList.remove("hide")
+}
+
+function doneNote(){
+    let doneBtn = document.querySelectorAll(".done")
+    doneBtn.forEach((d,i) =>{
+        d.addEventListener("click",()=> { delet(i)})
+    })
+}
+function delet(i){
+    localSave.splice(i,1)
+    localStorage.setItem("note",JSON.stringify(localSave));
+    location.reload()
+}
+
+function addToLocal(item){
+    localSave.push(item)
+    localStorage.setItem("note",JSON.stringify(localSave))
+    location.reload()
+}
+window.onload =() => {
+    disPlayData()
+    display()
+}
